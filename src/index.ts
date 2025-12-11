@@ -239,18 +239,24 @@ export const nodePolyfills = (options: PolyfillOptions = {}): Plugin => {
               : {},
           },
         },
-        esbuild: {
-          // In dev, the global polyfills need to be injected as a banner in order for isolated scripts (such as Vue SFCs) to have access to them.
-          banner: isDev ? globalShimsBanner : undefined,
-        },
+        ...(isRolldownVite
+          ? {}
+          : {
+              esbuild: {
+                // In dev, the global polyfills need to be injected as a banner in order for isolated scripts (such as Vue SFCs) to have access to them.
+                banner: isDev ? globalShimsBanner : undefined,
+              },
+            }),
         optimizeDeps: {
           exclude: [
             ...globalShimPaths,
           ],
           ...isRolldownVite
             ? {
-                rollupOptions: {
-                  define: defines,
+                rolldownOptions: {
+                  transform: {
+                    define: defines,
+                  },
                   resolve: {
                     // https://github.com/niksy/node-stdlib-browser/blob/3e7cd7f3d115ac5c4593b550e7d8c4a82a0d4ac4/README.md?plain=1#L150
                     alias: {
